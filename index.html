@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Prompt Builder</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --output-bg: #0f172a;
+            --output-text: #f8fafc;
+        }
+
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-light: #94a3b8;
+            --border: #334155;
+            --output-bg: #020617;
+            --output-text: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 2rem 1rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .theme-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .theme-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 992px) {
+            .main-layout {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .custom-input-container {
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .custom-input-container.active {
+            display: block;
+        }
+
+        .custom-input-container input, 
+        .custom-input-container textarea {
+            border-color: var(--primary);
+        }
+
+        .sticky-side {
+            position: self-start;
+            top: 2rem;
+        }
+
+        @media (min-width: 992px) {
+            .sticky-side {
+                position: sticky;
+            }
+        }
+
+        .output-box {
+            background: var(--output-bg);
+            color: var(--output-text);
+            padding: 1.5rem;
+            border-radius: 8px;
+            min-height: 350px;
+            max-height: 650px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border: 1px solid var(--border);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            text-align: center;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .copy-success {
+            color: #22c55e;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="theme-toggle-container">
+        <button class="theme-btn" id="themeToggleBtn" onclick="toggleDarkMode()">Switch to Dark Mode</button>
+    </div>
+
+    <header>
+        <h1>AI Visual Prompt Builder</h1>
+        <p>Configure structural layouts, artwork themes, and text rendering guardrails seamlessly.</p>
+    </header>
+
+    <div class="main-layout">
+        <div class="panel">
+            <h2 class="panel-title">1. Canvas Layout</h2>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="layout">Canvas Layout & Aspect Ratio</label>
+                    <select id="layout" onchange="toggleCustom(this, 'customLayout')">
+                        <option value="A professional graphic design, vertical poster format (9:16 aspect ratio)." selected>Vertical Poster/Status (9:16)</option>
+                        <option value="A professional social media graphic design, square format (1:1 aspect ratio).">Square Post (1:1)</option>
+                        <option value="A professional landscape banner design, horizontal format (16:9 aspect ratio).">Horizontal Banner (16:9)</option>
+                        <option value="CUSTOM">-- Custom Layout --</option>
+                    </select>
+                    <div id="customLayout" class="custom-input-container">
+                        <input type="text" placeholder="Specify custom aspect ratio or application layout..." oninput="updatePrompt()">
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="panel-title">2. Imagery & Environmental Details</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="subjects">Deities / Main Subjects</label>
+                    <select id="subjects" onchange="toggleCustom(this, 'customSubjects')">
+                        <option value="GANESHA_DYNAMIC" selected>Lord Ganesha Blessing Pose</option>
+                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a beautifully detailed illustration of Lord Hanuman in a powerful blessing pose, holding a golden Gada, with glowing radiant energy.">Lord Hanuman (Blessing Pose & Gada)</option>
+                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is Goddess Laxmi seated gracefully on a pink lotus flower, radiating wealth, light, and prosperity.">Goddess Laxmi (Lotus & Wealth Pose)</option>
+                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a divine portrait of Radha Krishna standing together lovingly under a glowing moonlit banyan tree.">Radha Krishna (Divine Love Portrait)</option>
+                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a beautifully detailed, vibrant vector illustration of Lord Jagannath, Balabhadra, and Subhadra. The deities are framed by an ornate, traditional stone archway (torana) without any stray artifacts or limbs.">Lord Jagannath Trio with Torana Arch</option>
+                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a close-up portrait of Lord Shiva and Goddess Parvati; Shiva features light blue skin with a crescent moon nestled in his hair, while Parvati is adorned with fine traditional Indian ornaments.">Shiva & Parvati Close-up</option>
+                        <option value="CUSTOM">-- Custom Subject/Deity --</option>
+                    </select>
+                    <div id="customSubjects" class="custom-input-container">
+                        <input type="text" placeholder="Describe deity features, posture, and traits..." oninput="updatePrompt()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="artStyle">Artistic Rendering Style</label>
+                    <select id="artStyle" onchange="toggleCustom(this, 'customArtStyle')">
+                        <option value="modern digital devotional painting with soft dramatic lighting" selected>Modern Digital Painting</option>
+                        <option value="high-resolution, rich-color lithograph-style Hindu calendar art">Classic Calendar Art (Lithograph)</option>
+                        <option value="traditional Indian watercolor painting with intricate detailing">Traditional Watercolor</option>
+                        <option value="3D realistic cinematic render with warm divine glow and ornate gold accents">3D Realistic Cinematic Render</option>
+                        <option value="studio photography style with warm studio lights and crisp background details">Studio Photography Style</option>
+                        <option value="CUSTOM">-- Custom Art Style --</option>
+                    </select>
+                    <div id="customArtStyle" class="custom-input-container">
+                        <input type="text" placeholder="Enter custom art style descriptors..." oninput="updatePrompt()">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="background">Background & Scenery</label>
+                    <select id="background" onchange="toggleCustom(this, 'customBackground')">
+                        <option value="[BACKGROUND & FRAME]: Universe galaxy view" selected>Universe galaxy view</option>
+                        <option value="[BACKGROUND & FRAME]: Clean, texture-rich paper-white background set against snow-covered Himalayan peaks under a bright, golden-sunlit sky with divine glowing radial auras.">Himalayan Peaks with Golden Aura</option>
+                        <option value="[BACKGROUND & FRAME]: A serene riverbank of the Ganges at sunset with soft glowing oil lamps and holy temples fading into the mist, featuring a deep maroon background with subtle mandala patterns.">Ganges Riverbank at Sunset</option>
+                        <option value="CUSTOM">-- Custom Background Landscape --</option>
+                    </select>
+                    <div id="customBackground" class="custom-input-container">
+                        <input type="text" placeholder="Describe the background canvas and environmental atmosphere..." oninput="updatePrompt()">
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="panel-title">3. Layout Overlays & Typography Design</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="panelStyle">Overlay Panel Container Style</label>
+                    <select id="panelStyle" onchange="toggleCustom(this, 'customPanelStyle')">
+                        <option value="A minimal, seamless flat container matching the color tone of the canvas template rules." selected>Seamless Flat Overlay Container</option>
+                        <option value="A deep maroon textured background overlay with subtle, faded mandala patterns.">Deep Maroon Textured Background with Mandala</option>
+                        <option value="A clean, central, slightly off-white instructional card panel overlays the lower portion of the image.">Standard Off-White Card Overlay</option>
+                        <option value="An elegant, semi-transparent parchment-textured scroll panel overlays the bottom center.">Parchment Scroll Overlay</option>
+                        <option value="CUSTOM">-- Custom Panel Container --</option>
+                    </select>
+                    <div id="customPanelStyle" class="custom-input-container">
+                        <input type="text" placeholder="Describe layout boundaries or container boxes..." oninput="updatePrompt()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="headingStyle">Heading Banner Design</label>
+                    <select id="headingStyle" onchange="toggleCustom(this, 'customHeadingStyle')">
+                        <option value="green-stroke" selected>Green Paint Stroke Banner (White Text)</option>
+                        <option value="blue-stroke">Blue Paint Stroke Banner (White Text)</option>
+                        <option value="red-stroke">Red Paint Stroke Banner (White Text)</option>
+                        <option value="saffron-stroke">Orange/Saffron Paint Stroke Banner (White Text)</option>
+                        <option value="gold-plate">Golden Metallic Plate (Navy Text)</option>
+                        <option value="minimal-rect">Minimalist Geometric Rectangle Frame</option>
+                        <option value="CUSTOM">-- Custom Header Layout --</option>
+                    </select>
+                    <div id="customHeadingStyle" class="custom-input-container">
+                        <input type="text" placeholder="Describe custom text-background banners..." oninput="updatePrompt()">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="titleText">Heading Title Text</label>
+                    <input type="text" id="titleText" value="ଏ ସଂସାରରେ ୫ଟି ସବୁଠାରୁ ବଡ ଜିନିଷ" oninput="updatePrompt()">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="bodyStyle">Body Typography & Content Formatting</label>
+                    <select id="bodyStyle" onchange="toggleCustom(this, 'customBodyStyle')">
+                        <option value="Handwriting style Text with colour pen underline for important text" selected>Handwriting style with color underlines</option>
+                        <option value="The text is cleanly arranged with generous line spacing, written in a dark, highly legible bold sans-serif Odia font, highlighted with distinct soft pastel color highlighters (alternating blue, yellow, green, pink, orange, and purple behind each line).">Alternating Multi-Color Text Highlights</option>
+                        <option value="The verses are structured cleanly using a crisp, modern typography layout where each line/step is cleanly isolated over a subtle color-coded band in a modern bold geometric charcoal font.">Modern Geometric Layout (Minimal Bands)</option>
+                        <option value="The text is inscribed in high-contrast gold metallic calligraphy with a subtle dropped shadow, spaced generously for maximum devotional poster readability.">Traditional Gold Inscribed Calligraphy</option>
+                        <option value="Crisp white neon-style typography rendered over a dark semi-translucent backdrop with distinct line numbering and bolded keywords.">High-Contrast Dark Mode Neon Typography</option>
+                        <option value="Classic elegant serif typography in deep navy blue, left-aligned with subtle bullet accents and soft line separators.">Classic Elegant Serif Layout</option>
+                        <option value="CUSTOM">-- Custom Hierarchy Layout Rules --</option>
+                    </select>
+                    <div id="customBodyStyle" class="custom-input-container">
+                        <textarea rows="2" placeholder="Specify font rules, highlighting behavior, colors, and row layouts..." oninput="updatePrompt()"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="bodyText">Body Verses / List Content (One phrase per line)</label>
+                    <textarea id="bodyText" rows="6" oninput="updatePrompt()">୧)ସବୁଠାରୁ ବଡ଼ ସମ୍ପତି : ନିଜ ବୁଦ୍ଧି
+୨)ସବୁଠାରୁ ଶକ୍ତିଶାଳୀ ଅସ୍ତ୍ର : ଧୌର୍ଯ୍ୟ
+୩)ସବୁଠାରୁ ଭଲ ସୁରକ୍ଷା ହେଉଛି : ବିଶ୍ବାସ
+୪)ସବୁଠାରୁ ଭଲ ଔଷଧ ହେଉଛି : ହସ
+୫)ଆଉ ସବୁଠୁ ଆଶ୍ଚର୍ଯ୍ୟ କଥା : ଏସବୁ ମାଗଣା</textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="borderStyle">Framing & Borders</label>
+                    <select id="borderStyle" onchange="toggleCustom(this, 'customBorder')">
+                        <option value="Floral border" selected>Floral border</option>
+                        <option value="A decorative gold and red traditional Indian ornamental border frames the entire design, ensuring a classic poster aesthetic. The complete layout is balanced and ultra-sharp.">Traditional Gold & Red Ornamental Border</option>
+                        <option value="A sleek, modern minimal gold border outlines the composition. The entire image has a high contrast graphic design balance ideal for clean educational infographics.">Minimalist Gold Frame Border</option>
+                        <option value="An intricate metallic brass temple arch (mandap) framing the full composition with detailed carved motifs.">Ornate Brass Temple Arch Border</option>
+                        <option value="A subtle glowing golden light halo border framing the inner edge of the canvas for a divine lighting effect.">Floating Glowing Light Halo Border</option>
+                        <option value="A delicate vintage floral corner accent frame, keeping the edges light while grounding the four corners of the canvas.">Vintage Floral Corner Accents</option>
+                        <option value="CUSTOM">-- Custom Framing --</option>
+                    </select>
+                    <div id="customBorder" class="custom-input-container">
+                        <input type="text" placeholder="Describe frame motifs, margins, or accents..." oninput="updatePrompt()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel sticky-side">
+            <h2 class="panel-title">Generated Prompt Output</h2>
+            <div class="output-box" id="promptResult">Select parameters to compile your prompt...</div>
+            <button class="btn" onclick="copyToClipboard()">Copy Prompt to Clipboard</button>
+            <div class="copy-success" id="copyMessage">✓ Prompt copied successfully!</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDarkMode() {
+        const body = document.documentElement;
+        const currentTheme = body.getAttribute('data-theme');
+        const btn = document.getElementById('themeToggleBtn');
+        
+        if (currentTheme === 'dark') {
+            body.removeAttribute('data-theme');
+            btn.innerText = "Switch to Dark Mode";
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            btn.innerText = "Switch to Light Mode";
+        }
+    }
+
+    function toggleCustom(selectElement, customContainerId) {
+        const container = document.getElementById(customContainerId);
+        if (selectElement.value === 'CUSTOM') {
+            container.classList.add('active');
+        } else {
+            container.classList.remove('active');
+        }
+        updatePrompt();
+    }
+
+    function getValue(selectId, customContainerId, fallbackLabel) {
+        const select = document.getElementById(selectId);
+        if (select.value === 'CUSTOM') {
+            const container = document.getElementById(customContainerId);
+            const input = container.querySelector('input, textarea');
+            return input.value.trim() || `[Insert Custom ${fallbackLabel}]`;
+        }
+        return select.value;
+    }
+
+    function updatePrompt() {
+        const layout = getValue('layout', 'customLayout', 'Layout/Ratio');
+        const artStyle = getValue('artStyle', 'customArtStyle', 'Art Style');
+        
+        let subjects = getValue('subjects', 'customSubjects', 'Subject/Deity Details');
+        if (subjects === 'GANESHA_DYNAMIC') {
+            subjects = `[TOP EMBELLISHMENT]: Lord Ganesha blessing pose ${artStyle}`;
+        }
+
+        const background = getValue('background', 'customBackground', 'Background Details');
+        const panelStyle = getValue('panelStyle', 'customPanelStyle', 'Panel Style');
+        
+        const headingSelection = document.getElementById('headingStyle').value;
+        const titleText = document.getElementById('titleText').value.trim();
+
+        let headingPrompt = '';
+        if (headingSelection === 'green-stroke') {
+            headingPrompt = `[HEADING]: Green Paint stroke ( White Text) Include the title text clearly written out: "${titleText}".`;
+        } else if (headingSelection === 'blue-stroke') {
+            headingPrompt = `[HEADING]: Below the deity illustration, a prominent horizontal deep blue brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a stylized, white script: "${titleText}".`;
+        } else if (headingSelection === 'red-stroke') {
+            headingPrompt = `[HEADING]: Below the deity illustration, a prominent vibrant red brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a bold white script: "${titleText}".`;
+        } else if (headingSelection === 'saffron-stroke') {
+            headingPrompt = `[HEADING]: Below the deity illustration, a prominent horizontal orange/saffron brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a stylized white script: "${titleText}".`;
+        } else if (headingSelection === 'gold-plate') {
+            headingPrompt = `[HEADING]: Below the illustration, a sleek metallic golden plate graphic serves as the title background. Overlaid on this is the title text in a bold, dark navy blue script: "${titleText}".`;
+        } else if (headingSelection === 'minimal-rect') {
+            headingPrompt = `[HEADING]: Below the illustration, a clean geometric rectangle frame outlines the header space. Inside it, the title is written in an elegant, bold red font: "${titleText}".`;
+        } else if (headingSelection === 'CUSTOM') {
+            const customHeadingText = document.getElementById('customHeadingStyle').querySelector('input').value.trim() || '[Custom Heading Layout Elements]';
+            headingPrompt = `[HEADING]: ${customHeadingText} Include the title text clearly written out: "${titleText}".`;
+        }
+
+        const bodyStyle = getValue('bodyStyle', 'customBodyStyle', 'Typography Style Rules');
+        const bodyText = document.getElementById('bodyText').value;
+        const borderStyle = getValue('borderStyle', 'customBorder', 'Border/Framing Style');
+
+        const lines = bodyText.split('\n').filter(line => line.trim() !== '');
+        let formattedLines = '[THE TEXT TO RENDER]:\n';
+        lines.forEach(line => {
+            formattedLines += `"${line.trim()}"\n`;
+        });
+
+        const guardrails = `[CRITICAL INSTRUCTIONS FOR TYPOGRAPHY & RENDERING]:
+- The text script must be rendered exactly as provided, preserving all precise character shapes, complex text conjuncts, and vowel signs (matras). 
+- Every character must be sharp, high-resolution, perfectly legible, and free of typos, digital distortion, or text blurring. 
+- Ensure absolutely clean spacing between lines so the layout feels like a professionally designed poster.`;
+
+        const generatedPrompt = `${layout}\n\nRendered in a style of: ${artStyle}.\n\n${subjects}\n\n${background}\n\n${panelStyle}\n\n${headingPrompt}\n\n[BODY TEXT LAYOUT]: ${bodyStyle}\n\n${formattedLines}\n${borderStyle}\n\n${guardrails}`;
+
+        document.getElementById('promptResult').innerText = generatedPrompt;
+    }
+
+    function copyToClipboard() {
+        const textToCopy = document.getElementById('promptResult').innerText;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const msg = document.getElementById('copyMessage');
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 2500);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
+    }
+
+    window.onload = updatePrompt;
+</script>
+
+</body>
+</html>
