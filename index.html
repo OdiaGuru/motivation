@@ -138,10 +138,23 @@
             gap: 0.5rem;
         }
 
+        .label-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .label-container input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
         label {
             font-weight: 600;
             font-size: 0.9rem;
             color: var(--text);
+            cursor: pointer;
         }
 
         select, input, textarea {
@@ -246,7 +259,10 @@
             <h2 class="panel-title">1. Canvas Layout</h2>
             <div class="form-grid">
                 <div class="form-group full-width">
-                    <label for="layout">Canvas Layout & Aspect Ratio</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enableLayout" checked onchange="updatePrompt()">
+                        <label for="enableLayout">Canvas Layout & Aspect Ratio</label>
+                    </div>
                     <select id="layout" onchange="toggleCustom(this, 'customLayout')">
                         <option value="A professional graphic design, vertical poster format (9:16 aspect ratio)." selected>Vertical Poster/Status (9:16)</option>
                         <option value="A professional social media graphic design, square format (1:1 aspect ratio).">Square Post (1:1)</option>
@@ -262,7 +278,10 @@
             <h2 class="panel-title">2. Imagery & Environmental Details</h2>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="subjects">Deities / Main Subjects</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enableSubjects" checked onchange="updatePrompt()">
+                        <label for="enableSubjects">Deities / Main Subjects</label>
+                    </div>
                     <select id="subjects" onchange="toggleCustom(this, 'customSubjects')">
                         <option value="GANESHA_DYNAMIC" selected>Lord Ganesha Blessing Pose</option>
                         <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a beautifully detailed illustration of Lord Hanuman in a powerful blessing pose, holding a golden Gada, with glowing radiant energy.">Lord Hanuman (Blessing Pose & Gada)</option>
@@ -278,7 +297,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="artStyle">Artistic Rendering Style</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enableArtStyle" checked onchange="updatePrompt()">
+                        <label for="enableArtStyle">Artistic Rendering Style</label>
+                    </div>
                     <select id="artStyle" onchange="toggleCustom(this, 'customArtStyle')">
                         <option value="modern digital devotional painting with soft dramatic lighting" selected>Modern Digital Painting</option>
                         <option value="high-resolution, rich-color lithograph-style Hindu calendar art">Classic Calendar Art (Lithograph)</option>
@@ -293,7 +315,10 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="background">Background & Scenery</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enableBackground" checked onchange="updatePrompt()">
+                        <label for="enableBackground">Background & Scenery</label>
+                    </div>
                     <select id="background" onchange="toggleCustom(this, 'customBackground')">
                         <option value="[BACKGROUND & FRAME]: Universe galaxy view" selected>Universe galaxy view</option>
                         <option value="[BACKGROUND & FRAME]: Clean, texture-rich paper-white background set against snow-covered Himalayan peaks under a bright, golden-sunlit sky with divine glowing radial auras.">Himalayan Peaks with Golden Aura</option>
@@ -309,7 +334,10 @@
             <h2 class="panel-title">3. Layout Overlays & Typography Design</h2>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="panelStyle">Overlay Panel Container Style</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enablePanelStyle" checked onchange="updatePrompt()">
+                        <label for="enablePanelStyle">Overlay Panel Container Style</label>
+                    </div>
                     <select id="panelStyle" onchange="toggleCustom(this, 'customPanelStyle')">
                         <option value="A minimal, seamless flat container matching the color tone of the canvas template rules." selected>Seamless Flat Overlay Container</option>
                         <option value="A deep maroon textured background overlay with subtle, faded mandala patterns.">Deep Maroon Textured Background with Mandala</option>
@@ -323,7 +351,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="headingStyle">Heading Banner Design</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enableHeadingStyle" checked onchange="updatePrompt()">
+                        <label for="enableHeadingStyle">Heading Banner Design & Title Text</label>
+                    </div>
                     <select id="headingStyle" onchange="toggleCustom(this, 'customHeadingStyle')">
                         <option value="green-stroke" selected>Green Paint Stroke Banner (White Text)</option>
                         <option value="blue-stroke">Blue Paint Stroke Banner (White Text)</option>
@@ -344,7 +375,10 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="bodyStyle">Body Typography & Content Formatting</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enableBodyStyle" checked onchange="updatePrompt()">
+                        <label for="enableBodyStyle">Body Typography & Content Formatting</label>
+                    </div>
                     <select id="bodyStyle" onchange="toggleCustom(this, 'customBodyStyle')">
                         <option value="Handwriting style Text with colour pen underline for important text" selected>Handwriting style with color underlines</option>
                         <option value="The text is cleanly arranged with generous line spacing, written in a dark, highly legible bold sans-serif Odia font, highlighted with distinct soft pastel color highlighters (alternating blue, yellow, green, pink, orange, and purple behind each line).">Alternating Multi-Color Text Highlights</option>
@@ -360,7 +394,10 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="bodyText">Body Verses / List Content (One phrase per line)</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enableBodyText" checked onchange="updatePrompt()">
+                        <label for="enableBodyText">Body Verses / List Content (One phrase per line)</label>
+                    </div>
                     <textarea id="bodyText" rows="6" oninput="updatePrompt()">୧)ସବୁଠାରୁ ବଡ଼ ସମ୍ପତି : ନିଜ ବୁଦ୍ଧି
 ୨)ସବୁଠାରୁ ଶକ୍ତିଶାଳୀ ଅସ୍ତ୍ର : ଧୌର୍ଯ୍ୟ
 ୩)ସବୁଠାରୁ ଭଲ ସୁରକ୍ଷା ହେଉଛି : ବିଶ୍ବାସ
@@ -369,7 +406,10 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="borderStyle">Framing & Borders</label>
+                    <div class="label-container">
+                        <input type="checkbox" id="enableBorderStyle" checked onchange="updatePrompt()">
+                        <label for="enableBorderStyle">Framing & Borders</label>
+                    </div>
                     <select id="borderStyle" onchange="toggleCustom(this, 'customBorder')">
                         <option value="Floral border" selected>Floral border</option>
                         <option value="A decorative gold and red traditional Indian ornamental border frames the entire design, ensuring a classic poster aesthetic. The complete layout is balanced and ultra-sharp.">Traditional Gold & Red Ornamental Border</option>
@@ -381,6 +421,13 @@
                     </select>
                     <div id="customBorder" class="custom-input-container">
                         <input type="text" placeholder="Describe frame motifs, margins, or accents..." oninput="updatePrompt()">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <div class="label-container">
+                        <input type="checkbox" id="enableGuardrails" checked onchange="updatePrompt()">
+                        <label for="enableGuardrails">Typography Guardrails & Critical Instructions</label>
                     </div>
                 </div>
             </div>
@@ -431,56 +478,105 @@
     }
 
     function updatePrompt() {
-        const layout = getValue('layout', 'customLayout', 'Layout/Ratio');
-        const artStyle = getValue('artStyle', 'customArtStyle', 'Art Style');
-        
-        let subjects = getValue('subjects', 'customSubjects', 'Subject/Deity Details');
-        if (subjects === 'GANESHA_DYNAMIC') {
-            subjects = `[TOP EMBELLISHMENT]: Lord Ganesha blessing pose ${artStyle}`;
+        const promptParts = [];
+
+        // 1. Layout
+        if (document.getElementById('enableLayout').checked) {
+            const layout = getValue('layout', 'customLayout', 'Layout/Ratio');
+            promptParts.push(layout);
         }
 
-        const background = getValue('background', 'customBackground', 'Background Details');
-        const panelStyle = getValue('panelStyle', 'customPanelStyle', 'Panel Style');
-        
-        const headingSelection = document.getElementById('headingStyle').value;
-        const titleText = document.getElementById('titleText').value.trim();
+        // 2. Deities / Main Subjects (Incorporating Artistic Rendering Style)
+        if (document.getElementById('enableSubjects').checked) {
+            let subjects = getValue('subjects', 'customSubjects', 'Subject/Deity Details');
+            const artStyleEnabled = document.getElementById('enableArtStyle').checked;
+            const artStyle = getValue('artStyle', 'customArtStyle', 'Art Style');
 
-        let headingPrompt = '';
-        if (headingSelection === 'green-stroke') {
-            headingPrompt = `[HEADING]: Green Paint stroke ( White Text) Include the title text clearly written out: "${titleText}".`;
-        } else if (headingSelection === 'blue-stroke') {
-            headingPrompt = `[HEADING]: Below the deity illustration, a prominent horizontal deep blue brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a stylized, white script: "${titleText}".`;
-        } else if (headingSelection === 'red-stroke') {
-            headingPrompt = `[HEADING]: Below the deity illustration, a prominent vibrant red brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a bold white script: "${titleText}".`;
-        } else if (headingSelection === 'saffron-stroke') {
-            headingPrompt = `[HEADING]: Below the deity illustration, a prominent horizontal orange/saffron brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a stylized white script: "${titleText}".`;
-        } else if (headingSelection === 'gold-plate') {
-            headingPrompt = `[HEADING]: Below the illustration, a sleek metallic golden plate graphic serves as the title background. Overlaid on this is the title text in a bold, dark navy blue script: "${titleText}".`;
-        } else if (headingSelection === 'minimal-rect') {
-            headingPrompt = `[HEADING]: Below the illustration, a clean geometric rectangle frame outlines the header space. Inside it, the title is written in an elegant, bold red font: "${titleText}".`;
-        } else if (headingSelection === 'CUSTOM') {
-            const customHeadingText = document.getElementById('customHeadingStyle').querySelector('input').value.trim() || '[Custom Heading Layout Elements]';
-            headingPrompt = `[HEADING]: ${customHeadingText} Include the title text clearly written out: "${titleText}".`;
+            if (subjects === 'GANESHA_DYNAMIC') {
+                subjects = `[TOP EMBELLISHMENT]: Lord Ganesha blessing pose${artStyleEnabled ? ' Rendered in a style of: ' + artStyle + '.' : ''}`;
+            } else if (artStyleEnabled) {
+                if (subjects.startsWith('[TOP EMBELLISHMENT]:')) {
+                    subjects += ` Rendered in a style of: ${artStyle}.`;
+                } else {
+                    subjects = `[TOP EMBELLISHMENT]: ${subjects} Rendered in a style of: ${artStyle}.`;
+                }
+            } else if (!subjects.startsWith('[TOP EMBELLISHMENT]:')) {
+                subjects = `[TOP EMBELLISHMENT]: ${subjects}`;
+            }
+
+            promptParts.push(subjects);
         }
 
-        const bodyStyle = getValue('bodyStyle', 'customBodyStyle', 'Typography Style Rules');
-        const bodyText = document.getElementById('bodyText').value;
-        const borderStyle = getValue('borderStyle', 'customBorder', 'Border/Framing Style');
+        // 3. Background
+        if (document.getElementById('enableBackground').checked) {
+            const background = getValue('background', 'customBackground', 'Background Details');
+            promptParts.push(background);
+        }
 
-        const lines = bodyText.split('\n').filter(line => line.trim() !== '');
-        let formattedLines = '[THE TEXT TO RENDER]:\n';
-        lines.forEach(line => {
-            formattedLines += `"${line.trim()}"\n`;
-        });
+        // 4. Panel Style
+        if (document.getElementById('enablePanelStyle').checked) {
+            const panelStyle = getValue('panelStyle', 'customPanelStyle', 'Panel Style');
+            promptParts.push(panelStyle);
+        }
 
-        const guardrails = `[CRITICAL INSTRUCTIONS FOR TYPOGRAPHY & RENDERING]:
+        // 5. Heading Style & Text
+        if (document.getElementById('enableHeadingStyle').checked) {
+            const headingSelection = document.getElementById('headingStyle').value;
+            const titleText = document.getElementById('titleText').value.trim();
+            let headingPrompt = '';
+
+            if (headingSelection === 'green-stroke') {
+                headingPrompt = `[HEADING]: Green Paint stroke ( White Text) Include the title text clearly written out: "${titleText}".`;
+            } else if (headingSelection === 'blue-stroke') {
+                headingPrompt = `[HEADING]: Below the deity illustration, a prominent horizontal deep blue brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a stylized, white script: "${titleText}".`;
+            } else if (headingSelection === 'red-stroke') {
+                headingPrompt = `[HEADING]: Below the deity illustration, a prominent vibrant red brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a bold white script: "${titleText}".`;
+            } else if (headingSelection === 'saffron-stroke') {
+                headingPrompt = `[HEADING]: Below the deity illustration, a prominent horizontal orange/saffron brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a stylized white script: "${titleText}".`;
+            } else if (headingSelection === 'gold-plate') {
+                headingPrompt = `[HEADING]: Below the illustration, a sleek metallic golden plate graphic serves as the title background. Overlaid on this is the title text in a bold, dark navy blue script: "${titleText}".`;
+            } else if (headingSelection === 'minimal-rect') {
+                headingPrompt = `[HEADING]: Below the illustration, a clean geometric rectangle frame outlines the header space. Inside it, the title is written in an elegant, bold red font: "${titleText}".`;
+            } else if (headingSelection === 'CUSTOM') {
+                const customHeadingText = document.getElementById('customHeadingStyle').querySelector('input').value.trim() || '[Custom Heading Layout Elements]';
+                headingPrompt = `[HEADING]: ${customHeadingText} Include the title text clearly written out: "${titleText}".`;
+            }
+            promptParts.push(headingPrompt);
+        }
+
+        // 6. Body Style
+        if (document.getElementById('enableBodyStyle').checked) {
+            const bodyStyle = getValue('bodyStyle', 'customBodyStyle', 'Typography Style Rules');
+            promptParts.push(`[BODY TEXT LAYOUT]: ${bodyStyle}`);
+        }
+
+        // 7. Body Text
+        if (document.getElementById('enableBodyText').checked) {
+            const bodyText = document.getElementById('bodyText').value;
+            const lines = bodyText.split('\n').filter(line => line.trim() !== '');
+            let formattedLines = '[THE TEXT TO RENDER]:\n';
+            lines.forEach(line => {
+                formattedLines += `"${line.trim()}"\n`;
+            });
+            promptParts.push(formattedLines.trim());
+        }
+
+        // 8. Border Style
+        if (document.getElementById('enableBorderStyle').checked) {
+            const borderStyle = getValue('borderStyle', 'customBorder', 'Border/Framing Style');
+            promptParts.push(borderStyle);
+        }
+
+        // 9. Guardrails
+        if (document.getElementById('enableGuardrails').checked) {
+            const guardrails = `[CRITICAL INSTRUCTIONS FOR TYPOGRAPHY & RENDERING]:
 - The text script must be rendered exactly as provided, preserving all precise character shapes, complex text conjuncts, and vowel signs (matras). 
 - Every character must be sharp, high-resolution, perfectly legible, and free of typos, digital distortion, or text blurring. 
 - Ensure absolutely clean spacing between lines so the layout feels like a professionally designed poster.`;
+            promptParts.push(guardrails);
+        }
 
-        const generatedPrompt = `${layout}\n\nRendered in a style of: ${artStyle}.\n\n${subjects}\n\n${background}\n\n${panelStyle}\n\n${headingPrompt}\n\n[BODY TEXT LAYOUT]: ${bodyStyle}\n\n${formattedLines}\n${borderStyle}\n\n${guardrails}`;
-
-        document.getElementById('promptResult').innerText = generatedPrompt;
+        document.getElementById('promptResult').innerText = promptParts.join('\n\n');
     }
 
     function copyToClipboard() {
