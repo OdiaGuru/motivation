@@ -1,599 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Prompt Builder</title>
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --output-bg: #0f172a;
-            --output-text: #f8fafc;
-        }
-
-        /* Dark Mode Variables */
-        [data-theme="dark"] {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
-            --text-light: #94a3b8;
-            --border: #334155;
-            --output-bg: #020617;
-            --output-text: #f1f5f9;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 2rem 1rem;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-            position: relative;
-        }
-
-        header h1 {
-            color: var(--primary);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        header p {
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        .theme-toggle-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 1rem;
-        }
-
-        .theme-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .theme-btn:hover {
-            border-color: var(--primary);
-        }
-
-        .main-layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-
-        @media (min-width: 992px) {
-            .main-layout {
-                grid-template-columns: 1.2fr 0.8fr;
-            }
-        }
-
-        .panel {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .panel-title {
-            font-size: 1.4rem;
-            color: var(--text);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.25rem;
-        }
-
-        @media (min-width: 640px) {
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .full-width {
-                grid-column: span 2;
-            }
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .label-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .label-container input[type="checkbox"] {
-            width: auto;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text);
-            cursor: pointer;
-        }
-
-        select, input, textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.95rem;
-            background-color: var(--card-bg);
-            color: var(--text);
-        }
-
-        select:focus, input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .custom-input-container {
-            display: none;
-            margin-top: 0.5rem;
-        }
-
-        .custom-input-container.active {
-            display: block;
-        }
-
-        .custom-input-container input, 
-        .custom-input-container textarea {
-            border-color: var(--primary);
-        }
-
-        .sticky-side {
-            position: self-start;
-            top: 2rem;
-        }
-
-        @media (min-width: 992px) {
-            .sticky-side {
-                position: sticky;
-            }
-        }
-
-        .output-box {
-            background: var(--output-bg);
-            color: var(--output-text);
-            padding: 1.5rem;
-            border-radius: 8px;
-            min-height: 350px;
-            max-height: 650px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            border: 1px solid var(--border);
-        }
-
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 1rem;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            text-align: center;
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .copy-success {
-            color: #22c55e;
-            font-weight: bold;
-            text-align: center;
-            display: none;
-            font-size: 0.95rem;
-            margin-top: 0.5rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devotional Poster Prompt Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f1f6;--card:#fff;--ink:#1f1626;--mute:#6b5f75;--line:#e3dce8;--acc:#b8470a;--acc2:#7a1f3d;--chip:#f3edf6;--out:#1a0f1f;--outink:#f6eee4;--gold:#f0b429}
+[data-theme=dark]{--bg:#150d1b;--card:#21172a;--ink:#f3ecf7;--mute:#a597b2;--line:#392a45;--acc:#ff9a4d;--acc2:#e58aa8;--chip:#2c2037;--out:#0d0712;--outink:#f6eee4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hind',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;padding-bottom:5rem}
+h1,h2{font-family:'Marcellus',Georgia,serif;font-weight:400}
+header{background:#3a0f26;color:#fbe9c8;padding:1.6rem 1rem 1.4rem;border-bottom:4px solid var(--gold);position:relative}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:6px;background:repeating-linear-gradient(90deg,var(--gold) 0 10px,transparent 10px 20px);opacity:.55}
+.wrap{max-width:1240px;margin:0 auto;padding:0 1rem}
+header .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+h1{font-size:1.9rem}header p{opacity:.8;font-size:.95rem}
+.tbtn{background:transparent;border:1px solid #fbe9c880;color:inherit;border-radius:99px;padding:.4rem 1rem;cursor:pointer;font:inherit;font-size:.85rem}
+main{display:grid;gap:1.5rem;margin-top:2rem}
+@media(min-width:1000px){main{grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr)}.side{position:sticky;top:1rem;align-self:start}.bar{display:none}}
+.presets{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.4rem}
+.presets span{font-size:.85rem;color:var(--mute);margin-right:.2rem}
+.sec{font-size:1.25rem;margin:1.4rem 0 .6rem;color:var(--acc2)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.8rem}
+.card.off{opacity:.5}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-bottom:.6rem}
+.ch label{display:flex;align-items:center;gap:.5rem;font-weight:600;cursor:pointer}
+.ch small{color:var(--mute);font-size:.78rem;text-align:right}
+input[type=checkbox]{accent-color:var(--acc);width:1.05rem;height:1.05rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{background:var(--chip);color:var(--ink);border:1px solid transparent;border-radius:6px;padding:.38rem .7rem;font:inherit;font-size:.86rem;cursor:pointer}
+.chip:hover{border-color:var(--acc)}
+.chip[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+[data-theme=dark] .chip[aria-pressed=true]{color:#1a0f1f}
+.chip.cu{border-style:dashed;border-color:var(--line)}
+.desc{margin-top:.6rem;font-size:.8rem;color:var(--mute);border-left:3px solid var(--gold);padding-left:.6rem}
+textarea,input[type=text],select{width:100%;padding:.65rem .75rem;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);font:inherit;font-size:.95rem}
+textarea:focus,input:focus,select:focus,.chip:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.cust{margin-top:.6rem}
+.row{display:grid;gap:.8rem}@media(min-width:620px){.row.two{grid-template-columns:1fr 2fr}}
+.row label.l{font-weight:600;font-size:.88rem;display:block;margin-bottom:.3rem}
+.out{background:var(--out);color:var(--outink);border-radius:10px;padding:1rem;max-height:62vh;overflow:auto}
+.part{white-space:pre-wrap;font:.84rem/1.6 ui-monospace,Menlo,Consolas,monospace;padding:.15rem 0 .15rem .8rem;margin-bottom:.7rem;border-left:3px solid var(--gold)}
+.part.g{border-color:#7fd1a8}.part.n{border-color:#ef7a7a}.part.c{border-color:#8fb4ff}
+.lv{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:.7rem 0}
+.lv button{flex:1;padding:.5rem;border:0;background:var(--card);color:var(--ink);font:inherit;font-size:.85rem;cursor:pointer}
+.lv button[aria-pressed=true]{background:var(--acc2);color:#fff}
+.stats{font-size:.8rem;color:var(--mute);margin:.5rem 0}
+.btns{display:flex;gap:.5rem}
+.btn{flex:1;padding:.8rem;border:0;border-radius:8px;background:var(--acc);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+[data-theme=dark] .btn{color:#1a0f1f}
+.btn.s{background:var(--chip);color:var(--ink);flex:.6}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:.6rem 1rem;display:flex;gap:.5rem}
+.toast{position:fixed;left:50%;bottom:5.5rem;transform:translateX(-50%);background:#1f7a4d;color:#fff;padding:.5rem 1rem;border-radius:99px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 </head>
 <body>
+<header><div class="wrap">
+ <div><h1>Devotional Poster Prompt Studio</h1><p>Build detailed image prompts for deity posters with exact regional-script text.</p></div>
+ <button class="tbtn" id="theme">Dark mode</button>
+</div></header>
 
-<div class="container">
-    <div class="theme-toggle-container">
-        <button class="theme-btn" id="themeToggleBtn" onclick="toggleDarkMode()">Switch to Dark Mode</button>
-    </div>
+<div class="wrap"><main>
+<div id="form">
+ <div class="presets" id="presets"><span>Start from a template:</span></div>
 
-    <header>
-        <h1>AI Visual Prompt Builder</h1>
-        <p>Configure structural layouts, artwork themes, and text rendering guardrails seamlessly.</p>
-    </header>
-
-    <div class="main-layout">
-        <div class="panel">
-            <h2 class="panel-title">1. Canvas Layout</h2>
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableLayout" checked onchange="updatePrompt()">
-                        <label for="enableLayout">Canvas Layout & Aspect Ratio</label>
-                    </div>
-                    <select id="layout" onchange="toggleCustom(this, 'customLayout')">
-                        <option value="A professional graphic design, vertical poster format (9:16 aspect ratio)." selected>Vertical Poster/Status (9:16)</option>
-                        <option value="A professional social media graphic design, square format (1:1 aspect ratio).">Square Post (1:1)</option>
-                        <option value="A professional landscape banner design, horizontal format (16:9 aspect ratio).">Horizontal Banner (16:9)</option>
-                        <option value="CUSTOM">-- Custom Layout --</option>
-                    </select>
-                    <div id="customLayout" class="custom-input-container">
-                        <input type="text" placeholder="Specify custom aspect ratio or application layout..." oninput="updatePrompt()">
-                    </div>
-                </div>
-            </div>
-
-            <h2 class="panel-title">2. Imagery & Environmental Details</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableSubjects" checked onchange="updatePrompt()">
-                        <label for="enableSubjects">Deities / Main Subjects</label>
-                    </div>
-                    <select id="subjects" onchange="toggleCustom(this, 'customSubjects')">
-                        <option value="GANESHA_DYNAMIC" selected>Lord Ganesha Blessing Pose</option>
-                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a beautifully detailed illustration of Lord Hanuman in a powerful blessing pose, holding a golden Gada, with glowing radiant energy.">Lord Hanuman (Blessing Pose & Gada)</option>
-                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is Goddess Laxmi seated gracefully on a pink lotus flower, radiating wealth, light, and prosperity.">Goddess Laxmi (Lotus & Wealth Pose)</option>
-                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a divine portrait of Radha Krishna standing together lovingly under a glowing moonlit banyan tree.">Radha Krishna (Divine Love Portrait)</option>
-                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a beautifully detailed, vibrant vector illustration of Lord Jagannath, Balabhadra, and Subhadra. The deities are framed by an ornate, traditional stone archway (torana) without any stray artifacts or limbs.">Lord Jagannath Trio with Torana Arch</option>
-                        <option value="[TOP EMBELLISHMENT]: Centered prominently at the top is a close-up portrait of Lord Shiva and Goddess Parvati; Shiva features light blue skin with a crescent moon nestled in his hair, while Parvati is adorned with fine traditional Indian ornaments.">Shiva & Parvati Close-up</option>
-                        <option value="CUSTOM">-- Custom Subject/Deity --</option>
-                    </select>
-                    <div id="customSubjects" class="custom-input-container">
-                        <input type="text" placeholder="Describe deity features, posture, and traits..." oninput="updatePrompt()">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableArtStyle" checked onchange="updatePrompt()">
-                        <label for="enableArtStyle">Artistic Rendering Style</label>
-                    </div>
-                    <select id="artStyle" onchange="toggleCustom(this, 'customArtStyle')">
-                        <option value="modern digital devotional painting with soft dramatic lighting" selected>Modern Digital Painting</option>
-                        <option value="high-resolution, rich-color lithograph-style Hindu calendar art">Classic Calendar Art (Lithograph)</option>
-                        <option value="traditional Indian watercolor painting with intricate detailing">Traditional Watercolor</option>
-                        <option value="3D realistic cinematic render with warm divine glow and ornate gold accents">3D Realistic Cinematic Render</option>
-                        <option value="studio photography style with warm studio lights and crisp background details">Studio Photography Style</option>
-                        <option value="CUSTOM">-- Custom Art Style --</option>
-                    </select>
-                    <div id="customArtStyle" class="custom-input-container">
-                        <input type="text" placeholder="Enter custom art style descriptors..." oninput="updatePrompt()">
-                    </div>
-                </div>
-
-                <div class="form-group full-width">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableBackground" checked onchange="updatePrompt()">
-                        <label for="enableBackground">Background & Scenery</label>
-                    </div>
-                    <select id="background" onchange="toggleCustom(this, 'customBackground')">
-                        <option value="[BACKGROUND & FRAME]: Universe galaxy view" selected>Universe galaxy view</option>
-                        <option value="[BACKGROUND & FRAME]: Clean, texture-rich paper-white background set against snow-covered Himalayan peaks under a bright, golden-sunlit sky with divine glowing radial auras.">Himalayan Peaks with Golden Aura</option>
-                        <option value="[BACKGROUND & FRAME]: A serene riverbank of the Ganges at sunset with soft glowing oil lamps and holy temples fading into the mist, featuring a deep maroon background with subtle mandala patterns.">Ganges Riverbank at Sunset</option>
-                        <option value="CUSTOM">-- Custom Background Landscape --</option>
-                    </select>
-                    <div id="customBackground" class="custom-input-container">
-                        <input type="text" placeholder="Describe the background canvas and environmental atmosphere..." oninput="updatePrompt()">
-                    </div>
-                </div>
-            </div>
-
-            <h2 class="panel-title">3. Layout Overlays & Typography Design</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <div class="label-container">
-                        <input type="checkbox" id="enablePanelStyle" checked onchange="updatePrompt()">
-                        <label for="enablePanelStyle">Overlay Panel Container Style</label>
-                    </div>
-                    <select id="panelStyle" onchange="toggleCustom(this, 'customPanelStyle')">
-                        <option value="A minimal, seamless flat container matching the color tone of the canvas template rules." selected>Seamless Flat Overlay Container</option>
-                        <option value="A deep maroon textured background overlay with subtle, faded mandala patterns.">Deep Maroon Textured Background with Mandala</option>
-                        <option value="A clean, central, slightly off-white instructional card panel overlays the lower portion of the image.">Standard Off-White Card Overlay</option>
-                        <option value="An elegant, semi-transparent parchment-textured scroll panel overlays the bottom center.">Parchment Scroll Overlay</option>
-                        <option value="CUSTOM">-- Custom Panel Container --</option>
-                    </select>
-                    <div id="customPanelStyle" class="custom-input-container">
-                        <input type="text" placeholder="Describe layout boundaries or container boxes..." oninput="updatePrompt()">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableHeadingStyle" checked onchange="updatePrompt()">
-                        <label for="enableHeadingStyle">Heading Banner Design & Title Text</label>
-                    </div>
-                    <select id="headingStyle" onchange="toggleCustom(this, 'customHeadingStyle')">
-                        <option value="green-stroke" selected>Green Paint Stroke Banner (White Text)</option>
-                        <option value="blue-stroke">Blue Paint Stroke Banner (White Text)</option>
-                        <option value="red-stroke">Red Paint Stroke Banner (White Text)</option>
-                        <option value="saffron-stroke">Orange/Saffron Paint Stroke Banner (White Text)</option>
-                        <option value="gold-plate">Golden Metallic Plate (Navy Text)</option>
-                        <option value="minimal-rect">Minimalist Geometric Rectangle Frame</option>
-                        <option value="CUSTOM">-- Custom Header Layout --</option>
-                    </select>
-                    <div id="customHeadingStyle" class="custom-input-container">
-                        <input type="text" placeholder="Describe custom text-background banners..." oninput="updatePrompt()">
-                    </div>
-                </div>
-
-                <div class="form-group full-width">
-                    <label for="titleText">Heading Title Text</label>
-                    <input type="text" id="titleText" value="ଏ ସଂସାରରେ ୫ଟି ସବୁଠାରୁ ବଡ ଜିନିଷ" oninput="updatePrompt()">
-                </div>
-
-                <div class="form-group full-width">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableBodyStyle" checked onchange="updatePrompt()">
-                        <label for="enableBodyStyle">Body Typography & Content Formatting</label>
-                    </div>
-                    <select id="bodyStyle" onchange="toggleCustom(this, 'customBodyStyle')">
-                        <option value="Handwriting style Text with colour pen underline for important text" selected>Handwriting style with color underlines</option>
-                        <option value="The text is cleanly arranged with generous line spacing, written in a dark, highly legible bold sans-serif Odia font, highlighted with distinct soft pastel color highlighters (alternating blue, yellow, green, pink, orange, and purple behind each line).">Alternating Multi-Color Text Highlights</option>
-                        <option value="The verses are structured cleanly using a crisp, modern typography layout where each line/step is cleanly isolated over a subtle color-coded band in a modern bold geometric charcoal font.">Modern Geometric Layout (Minimal Bands)</option>
-                        <option value="The text is inscribed in high-contrast gold metallic calligraphy with a subtle dropped shadow, spaced generously for maximum devotional poster readability.">Traditional Gold Inscribed Calligraphy</option>
-                        <option value="Crisp white neon-style typography rendered over a dark semi-translucent backdrop with distinct line numbering and bolded keywords.">High-Contrast Dark Mode Neon Typography</option>
-                        <option value="Classic elegant serif typography in deep navy blue, left-aligned with subtle bullet accents and soft line separators.">Classic Elegant Serif Layout</option>
-                        <option value="CUSTOM">-- Custom Hierarchy Layout Rules --</option>
-                    </select>
-                    <div id="customBodyStyle" class="custom-input-container">
-                        <textarea rows="2" placeholder="Specify font rules, highlighting behavior, colors, and row layouts..." oninput="updatePrompt()"></textarea>
-                    </div>
-                </div>
-
-                <div class="form-group full-width">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableBodyText" checked onchange="updatePrompt()">
-                        <label for="enableBodyText">Body Verses / List Content (One phrase per line)</label>
-                    </div>
-                    <textarea id="bodyText" rows="6" oninput="updatePrompt()">୧)ସବୁଠାରୁ ବଡ଼ ସମ୍ପତି : ନିଜ ବୁଦ୍ଧି
+ <h2 class="sec">Your text</h2>
+ <div class="card">
+  <div class="row two">
+   <div><label class="l" for="lang">Script / language</label><select id="lang"></select></div>
+   <div><label class="l" for="title">Heading text</label><input type="text" id="title" value="ଏ ସଂସାରରେ ୫ଟି ସବୁଠାରୁ ବଡ ଜିନିଷ"></div>
+  </div>
+  <div class="ch" style="margin:.9rem 0 .4rem"><label><input type="checkbox" id="onText" checked> Body lines (one per line)</label><small id="lc"></small></div>
+  <textarea id="body" rows="6">୧)ସବୁଠାରୁ ବଡ଼ ସମ୍ପତି : ନିଜ ବୁଦ୍ଧି
 ୨)ସବୁଠାରୁ ଶକ୍ତିଶାଳୀ ଅସ୍ତ୍ର : ଧୌର୍ଯ୍ୟ
 ୩)ସବୁଠାରୁ ଭଲ ସୁରକ୍ଷା ହେଉଛି : ବିଶ୍ବାସ
 ୪)ସବୁଠାରୁ ଭଲ ଔଷଧ ହେଉଛି : ହସ
 ୫)ଆଉ ସବୁଠୁ ଆଶ୍ଚର୍ଯ୍ୟ କଥା : ଏସବୁ ମାଗଣା</textarea>
-                </div>
-
-                <div class="form-group full-width">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableBorderStyle" checked onchange="updatePrompt()">
-                        <label for="enableBorderStyle">Framing & Borders</label>
-                    </div>
-                    <select id="borderStyle" onchange="toggleCustom(this, 'customBorder')">
-                        <option value="Floral border" selected>Floral border</option>
-                        <option value="A decorative gold and red traditional Indian ornamental border frames the entire design, ensuring a classic poster aesthetic. The complete layout is balanced and ultra-sharp.">Traditional Gold & Red Ornamental Border</option>
-                        <option value="A sleek, modern minimal gold border outlines the composition. The entire image has a high contrast graphic design balance ideal for clean educational infographics.">Minimalist Gold Frame Border</option>
-                        <option value="An intricate metallic brass temple arch (mandap) framing the full composition with detailed carved motifs.">Ornate Brass Temple Arch Border</option>
-                        <option value="A subtle glowing golden light halo border framing the inner edge of the canvas for a divine lighting effect.">Floating Glowing Light Halo Border</option>
-                        <option value="A delicate vintage floral corner accent frame, keeping the edges light while grounding the four corners of the canvas.">Vintage Floral Corner Accents</option>
-                        <option value="CUSTOM">-- Custom Framing --</option>
-                    </select>
-                    <div id="customBorder" class="custom-input-container">
-                        <input type="text" placeholder="Describe frame motifs, margins, or accents..." oninput="updatePrompt()">
-                    </div>
-                </div>
-
-                <div class="form-group full-width">
-                    <div class="label-container">
-                        <input type="checkbox" id="enableGuardrails" checked onchange="updatePrompt()">
-                        <label for="enableGuardrails">Typography Guardrails & Critical Instructions</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel sticky-side">
-            <h2 class="panel-title">Generated Prompt Output</h2>
-            <div class="output-box" id="promptResult">Select parameters to compile your prompt...</div>
-            <button class="btn" onclick="copyToClipboard()">Copy Prompt to Clipboard</button>
-            <div class="copy-success" id="copyMessage">✓ Prompt copied successfully!</div>
-        </div>
-    </div>
+ </div>
+ <div id="groups"></div>
 </div>
 
+<aside class="side">
+ <h2 class="sec" style="margin-top:0">Your prompt</h2>
+ <div class="lv" id="lv" role="group" aria-label="Detail level">
+  <button data-v="1">Concise</button><button data-v="2">Detailed</button><button data-v="3">Maximum</button>
+ </div>
+ <div class="out" id="out"></div>
+ <div class="stats" id="stats"></div>
+ <div class="btns"><button class="btn" id="copy">Copy prompt</button><button class="btn s" id="dl">Download .txt</button></div>
+</aside>
+</main></div>
+<div class="bar"><button class="btn" id="copy2">Copy prompt</button></div>
+<div class="toast" id="toast">Prompt copied</div>
+
 <script>
-    function toggleDarkMode() {
-        const body = document.documentElement;
-        const currentTheme = body.getAttribute('data-theme');
-        const btn = document.getElementById('themeToggleBtn');
-        
-        if (currentTheme === 'dark') {
-            body.removeAttribute('data-theme');
-            btn.innerText = "Switch to Dark Mode";
-        } else {
-            body.setAttribute('data-theme', 'dark');
-            btn.innerText = "Switch to Light Mode";
-        }
-    }
+const $=s=>document.querySelector(s);
+const dot=s=>/[.!?]$/.test(s.trim())?s.trim():s.trim()+'.';
 
-    function toggleCustom(selectElement, customContainerId) {
-        const container = document.getElementById(customContainerId);
-        if (selectElement.value === 'CUSTOM') {
-            container.classList.add('active');
-        } else {
-            container.classList.remove('active');
-        }
-        updatePrompt();
-    }
+const LANG=[
+ ['Odia','Odia (ଓଡ଼ିଆ)','conjunct ligatures (e.g. କ୍ଷ, ଜ୍ଞ), vowel signs (matras) and the chandrabindu'],
+ ['Hindi','Hindi Devanagari','the unbroken shirorekha headline, conjuncts and vowel signs (matras)'],
+ ['Sanskrit','Sanskrit Devanagari','the shirorekha, conjuncts, anusvara, visarga and vowel signs (matras)'],
+ ['Bengali','Bengali (বাংলা)','conjunct ligatures, hasanta and vowel signs'],
+ ['Telugu','Telugu (తెలుగు)','stacked conjuncts and vowel signs'],
+ ['Tamil','Tamil (தமிழ்)','pulli dots and vowel signs'],
+ ['Gujarati','Gujarati (ગુજરાતી)','conjuncts and vowel signs (matras)'],
+ ['English','English','exact spelling and punctuation']
+];
 
-    function getValue(selectId, customContainerId, fallbackLabel) {
-        const select = document.getElementById(selectId);
-        if (select.value === 'CUSTOM') {
-            const container = document.getElementById(customContainerId);
-            const input = container.querySelector('input, textarea');
-            return input.value.trim() || `[Insert Custom ${fallbackLabel}]`;
-        }
-        return select.value;
-    }
+// [name, prompt text]. Each group's last chip is always "Custom".
+const G=[
+{k:'layout',sec:'Canvas & artwork',t:'Canvas & aspect ratio',items:[
+ ['Vertical story 9:16','vertical poster format (9:16 aspect ratio), made for phone status and stories.'],
+ ['Square 1:1','square social media format (1:1 aspect ratio).'],
+ ['Portrait 4:5','portrait feed format (4:5 aspect ratio).'],
+ ['Print portrait 3:4','print-ready portrait poster format (3:4 aspect ratio) with a generous safe margin.'],
+ ['Banner 16:9','horizontal banner format (16:9 aspect ratio).']]},
+{k:'subject',t:'Deity / main subject',items:[
+ ['Ganesha','Lord Ganesha seated on a lotus in a blessing (abhaya) pose, gentle smile, one hand raised in blessing and one holding modak, a small mouse at his feet, a soft golden halo behind his head.'],
+ ['Hanuman','Lord Hanuman in a powerful blessing pose, holding a golden gada, saffron-hued with glowing radiant energy and folded devotion.'],
+ ['Laxmi','Goddess Laxmi seated gracefully on a pink lotus, gold coins pouring from her hand, two elephants lifting water pots above her, radiating wealth and light.'],
+ ['Radha Krishna','Radha and Krishna standing together lovingly under a glowing moonlit banyan tree, Krishna with a flute and peacock feather.'],
+ ['Jagannath trio','Lord Jagannath, Balabhadra and Subhadra in a vibrant detailed illustration, framed by an ornate traditional stone archway (torana), with no stray artifacts or limbs.'],
+ ['Shiva & Parvati','a close-up divine portrait of Lord Shiva and Goddess Parvati; Shiva has light blue skin and a crescent moon in his hair, Parvati wears fine traditional Indian ornaments.'],
+ ['Saraswati','Goddess Saraswati in a white sari seated on a white lotus, playing the veena, a swan beside her and a gentle luminous glow.'],
+ ['Durga','Goddess Durga on a golden lion with a calm, compassionate face and a radiant halo, her many arms holding traditional symbols, drawn symmetrically and anatomically clean.'],
+ ['Vishnu','Lord Vishnu standing in a yellow dhoti with blue skin, holding the shankha, chakra, gada and padma, wearing a Kaustubha gem and a jewelled crown.'],
+ ['Ram Darbar','Lord Ram, Sita, Lakshman and Hanuman in a serene Ram Darbar composition, seated and facing the viewer, balanced and symmetrical.'],
+ ['Kartikeya','Lord Kartikeya (Murugan) as a youthful warrior with a golden vel, standing beside his peacock, bright and graceful.'],
+ ['Venkateshwara','Lord Venkateshwara (Balaji) standing tall with the traditional namam, heavily ornamented in gold jewellery and a tall crown.'],
+ ['Surya Dev','Surya Dev, the Sun God, riding a seven-horse chariot with a large radiant solar halo, Konark-inspired wheel carvings.'],
+ ['Annapurna','Goddess Annapurna seated on a throne holding a golden ladle and a vessel of food, a warm and nourishing presence.']]},
+{k:'art',t:'Artistic rendering style',items:[
+ ['Modern digital','modern digital devotional painting with soft dramatic lighting'],
+ ['Calendar lithograph','high-resolution, rich-color lithograph-style Hindu calendar art'],
+ ['Watercolor','traditional Indian watercolor painting with intricate detailing'],
+ ['3D cinematic','3D realistic cinematic render with a warm divine glow and ornate gold accents'],
+ ['Studio photo','studio photography style with warm studio lights and crisp background details'],
+ ['Pattachitra','Odisha Pattachitra folk painting with bold black outlines, flat natural pigment colors, large expressive eyes and a decorated vine border'],
+ ['Tanjore gold','Tanjore painting with raised gold-foil relief, inset gem accents and deep jewel-tone colors'],
+ ['Madhubani','Madhubani folk art with fine line hatching, double-line outlines and dense floral and fish motifs'],
+ ['Flat vector','clean flat vector illustration with smooth gradients, crisp shapes and a limited harmonious palette'],
+ ['Ravi Varma oil','classical oil painting in the manner of Raja Ravi Varma, with soft realistic faces, rich drapery and luminous skin tones']]},
+{k:'bg',t:'Background & scenery',items:[
+ ['Galaxy','Universe galaxy view'],
+ ['Himalayan peaks','Clean, texture-rich paper-white background set against snow-covered Himalayan peaks under a bright, golden-sunlit sky with divine glowing radial auras.'],
+ ['Ganges at sunset','A serene riverbank of the Ganges at sunset with soft glowing oil lamps and holy temples fading into the mist, over a deep maroon background with subtle mandala patterns.'],
+ ['Temple courtyard','A warm temple courtyard at dusk lit by rows of brass diyas, carved stone pillars softly blurred in the distance.'],
+ ['Lotus pond dawn','A still lotus pond at dawn with pink and white lotuses, light mist and a gentle golden sunrise.'],
+ ['Jagannath temple sunrise','The silhouette of the Puri Jagannath temple spire against a saffron sunrise sky with a flag fluttering on top.'],
+ ['Marigold festive','A festive backdrop of marigold garlands, scattered petals and hanging brass bells.'],
+ ['Saffron-maroon gradient','A smooth saffron-to-deep-maroon gradient with a faint radial glow behind the deity and subtle mandala watermark patterns.']]},
+{k:'palette',t:'Color palette',items:[
+ ['Saffron, maroon & gold','Saffron orange, deep maroon and metallic gold, with warm ivory highlights.'],
+ ['Royal blue & gold','Deep royal blue, bright gold and soft white, with a calm and majestic mood.'],
+ ['Emerald & gold','Rich emerald green, antique gold and cream, a prosperous and fresh mood.'],
+ ['Rose & lotus pink','Lotus pink, rose and warm white with touches of gold, a soft and gentle mood.'],
+ ['White & gold minimal','Pure white and soft gold on a quiet neutral base, clean and uncluttered.'],
+ ['Sunrise glow','Warm gradient of sunrise yellow, peach and coral with a deep plum accent for text.']]},
+{k:'panel',sec:'Layout & typography',t:'Text panel container',items:[
+ ['Seamless flat','A minimal, seamless flat container matching the color tone of the canvas.'],
+ ['Maroon mandala','A deep maroon textured background overlay with subtle, faded mandala patterns.'],
+ ['Off-white card','A clean, central, slightly off-white instructional card panel overlays the lower portion of the image.'],
+ ['Parchment scroll','An elegant, semi-transparent parchment-textured scroll panel overlays the bottom center.'],
+ ['Carved wood door','A carved dark-wood temple door panel with brass studs, softly lit from above.'],
+ ['Frosted glass','A frosted translucent glass panel with soft rounded corners over a blurred background.']]},
+{k:'heading',t:'Heading banner design',items:[
+ ['Green stroke','Below the deity illustration, a prominent horizontal green brushstroke banner serves as the title background, with the title in clean white script.'],
+ ['Blue stroke','Below the deity illustration, a prominent horizontal deep blue brushstroke banner serves as the title background, with the title in clean white script.'],
+ ['Red stroke','Below the deity illustration, a prominent vibrant red brushstroke banner serves as the title background, with the title in bold white script.'],
+ ['Saffron stroke','Below the deity illustration, a prominent horizontal saffron brushstroke banner serves as the title background, with the title in stylized white script.'],
+ ['Gold plate','Below the illustration, a sleek metallic golden plate serves as the title background, with the title in bold dark navy script.'],
+ ['Minimal rectangle','Below the illustration, a clean geometric rectangle frame outlines the header space, with the title in elegant bold red.'],
+ ['Ribbon scroll','Below the illustration, a curved ribbon banner with folded ends in deep red, with the title in cream lettering.'],
+ ['Temple arch plaque','Below the illustration, a temple-arch shaped plaque with carved gold edges holds the title in deep maroon lettering.']]},
+{k:'hfont',t:'Heading font style',items:[
+ ['Bold rounded','bold, rounded, friendly {S} display lettering with even stroke weight'],
+ ['Brush calligraphy','expressive brush-calligraphy {S} lettering with confident, flowing strokes'],
+ ['Classic serif','classic high-contrast serif {S} lettering, formal and elegant'],
+ ['Gold embossed','embossed metallic gold {S} lettering with a subtle bevel and soft shadow'],
+ ['Carved inscription','temple-inscription style {S} lettering that looks carved into stone'],
+ ['Modern geometric','modern geometric sans-serif {S} lettering with clean, uniform strokes']]},
+{k:'bodyStyle',t:'Body text layout',items:[
+ ['Handwritten + underline','Handwriting style text with colour pen underline for important text.'],
+ ['Multi-color highlights','The text is cleanly arranged with generous line spacing, in a dark, highly legible bold sans-serif font, highlighted with soft pastel highlighter bands (alternating blue, yellow, green, pink, orange and purple behind each line).'],
+ ['Minimal color bands','Each line is cleanly isolated over a subtle color-coded band in a modern bold geometric charcoal font.'],
+ ['Gold calligraphy','The text is inscribed in high-contrast gold metallic calligraphy with a subtle drop shadow, spaced generously for maximum poster readability.'],
+ ['Neon on dark','Crisp white neon-style typography over a dark semi-translucent backdrop with distinct line numbering and bolded keywords.'],
+ ['Elegant serif','Elegant serif typography in deep navy blue, left-aligned with subtle bullet accents and soft line separators.'],
+ ['Numbered medallions','Each line has a round gold numbered medallion on the left and bold dark text on the right, evenly spaced and left-aligned.'],
+ ['Notebook paper','Text written on lined notebook paper with a red margin line, in neat dark-blue ink with key words circled.']]},
+{k:'bfont',t:'Body font style',items:[
+ ['Clean bold sans','bold, highly legible, open {S} sans-serif'],
+ ['Traditional serif','traditional book-style {S} serif with moderate contrast'],
+ ['Handwritten','natural, neat {S} handwriting font with consistent letter sizes'],
+ ['Calligraphic','flowing calligraphic {S} script with graceful stroke endings'],
+ ['Rounded friendly','soft rounded {S} font with generous letter spacing'],
+ ['Manuscript','palm-leaf manuscript inspired {S} lettering, upright and evenly spaced']]},
+{k:'border',sec:'Frame',t:'Framing & borders',items:[
+ ['Floral border','Floral border'],
+ ['Gold & red ornamental','A decorative gold and red traditional Indian ornamental border frames the entire design, ensuring a classic poster aesthetic. The complete layout is balanced and ultra-sharp.'],
+ ['Minimal gold frame','A sleek, modern minimal gold border outlines the composition with high-contrast graphic balance.'],
+ ['Brass temple arch','An intricate metallic brass temple arch (mandap) frames the full composition with detailed carved motifs.'],
+ ['Glowing halo','A subtle glowing golden light halo border frames the inner edge of the canvas for a divine lighting effect.'],
+ ['Vintage floral corners','A delicate vintage floral corner accent frame keeps the edges light while grounding the four corners.'],
+ ['Pattachitra vine','A Pattachitra-style border of red and yellow vines, small peacocks and lotus buds running around the edge.'],
+ ['No border','No border or frame; the artwork bleeds cleanly to the canvas edge.']]}
+];
+const GM={};G.forEach(g=>{GM[g.k]=g;g.items.push(['Custom…','']);});
+const S={},ON={},CU={};
+G.forEach(g=>{S[g.k]=0;ON[g.k]=true;CU[g.k]='';});
+let LV=2;
 
-    function updatePrompt() {
-        const promptParts = [];
+const PRESETS=[
+ ['Wisdom card',{}],
+ ['Rath Yatra',{subject:4,art:5,bg:5,palette:0,border:6,heading:3}],
+ ['Lakshmi Puja',{subject:2,art:6,bg:6,palette:0,border:1,heading:4}],
+ ['Saraswati Puja',{subject:6,art:2,bg:4,palette:4,border:4,heading:1}],
+ ['Maha Shivaratri',{subject:5,art:3,bg:1,palette:1,border:3,heading:4}]
+];
 
-        // 1. Layout
-        if (document.getElementById('enableLayout').checked) {
-            const layout = getValue('layout', 'customLayout', 'Layout/Ratio');
-            promptParts.push(layout);
-        }
+// ---------- build UI ----------
+const groups=$('#groups');
+let lastSec='';
+G.forEach(g=>{
+ if(g.sec){const h=document.createElement('h2');h.className='sec';h.textContent=g.sec;groups.appendChild(h);}
+ const c=document.createElement('div');c.className='card';c.id='card-'+g.k;
+ c.innerHTML=`<div class="ch"><label><input type="checkbox" checked data-on="${g.k}"> ${g.t}</label><small></small></div><div class="chips"></div><div class="desc"></div><textarea class="cust" rows="2" hidden placeholder="Describe it in your own words…"></textarea>`;
+ groups.appendChild(c);
+ const chips=c.querySelector('.chips');
+ g.items.forEach((it,i)=>{
+  const b=document.createElement('button');b.type='button';b.className='chip'+(i===g.items.length-1?' cu':'');b.textContent=it[0];b.dataset.k=g.k;b.dataset.i=i;chips.appendChild(b);
+ });
+});
+$('#lang').innerHTML=LANG.map((l,i)=>`<option value="${i}">${l[1]}</option>`).join('');
+const pr=$('#presets');
+PRESETS.forEach(p=>{const b=document.createElement('button');b.className='chip';b.textContent=p[0];b.onclick=()=>{Object.assign(S,p[1]);sync();};pr.appendChild(b);});
 
-        // 2. Deities / Main Subjects (Incorporating Artistic Rendering Style)
-        if (document.getElementById('enableSubjects').checked) {
-            let subjects = getValue('subjects', 'customSubjects', 'Subject/Deity Details');
-            const artStyleEnabled = document.getElementById('enableArtStyle').checked;
-            const artStyle = getValue('artStyle', 'customArtStyle', 'Art Style');
+function sync(){
+ G.forEach(g=>{
+  const c=$('#card-'+g.k),n=g.items.length-1,isCu=S[g.k]===n;
+  c.classList.toggle('off',!ON[g.k]);
+  c.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i===S[g.k]));
+  c.querySelector('[data-on]').checked=ON[g.k];
+  const ta=c.querySelector('.cust');ta.hidden=!isCu;
+  const d=c.querySelector('.desc');d.hidden=isCu;d.textContent=isCu?'':g.items[S[g.k]][1].replace('{S}','');
+ });
+ render();
+}
 
-            if (subjects === 'GANESHA_DYNAMIC') {
-                subjects = `[TOP EMBELLISHMENT]: Lord Ganesha blessing pose${artStyleEnabled ? ' Rendered in a style of: ' + artStyle + '.' : ''}`;
-            } else if (artStyleEnabled) {
-                if (subjects.startsWith('[TOP EMBELLISHMENT]:')) {
-                    subjects += ` Rendered in a style of: ${artStyle}.`;
-                } else {
-                    subjects = `[TOP EMBELLISHMENT]: ${subjects} Rendered in a style of: ${artStyle}.`;
-                }
-            } else if (!subjects.startsWith('[TOP EMBELLISHMENT]:')) {
-                subjects = `[TOP EMBELLISHMENT]: ${subjects}`;
-            }
+// ---------- compose ----------
+function val(k){
+ if(!ON[k])return null;
+ const g=GM[k],it=g.items[S[k]];
+ return S[k]===g.items.length-1?(CU[k].trim()||`[Insert custom ${g.t.toLowerCase()}]`):it[1];
+}
+function compose(){
+ const L=LANG[+$('#lang').value],T=$('#title').value.trim(),P=[];
+ const add=(text,cls)=>P.push({text,cls});
+ let v=val('layout');if(v)add('A professional graphic design, '+v);
+ const sub=val('subject'),art=val('art');
+ if(sub)add(`[TOP EMBELLISHMENT]: Centered prominently at the top is ${dot(sub).replace(/^./,m=>m)}${art?` Rendered in the style of: ${dot(art)}`:''}`);
+ else if(art)add(`[ART STYLE]: ${dot(art)}`);
+ if(v=val('bg'))add(`[BACKGROUND & FRAME]: ${dot(v)}`);
+ if(v=val('palette'))add(`[COLOR PALETTE]: ${dot(v)}`);
+ if(v=val('panel'))add(`[TEXT PANEL]: ${dot(v)}`);
+ if(v=val('heading')){
+  const hf=val('hfont');
+  add(`[HEADING]: ${dot(v)} The title is written exactly as: "${T}".${hf?` Lettering: ${dot(hf.replace('{S}',L[0]))}`:''}`);
+ }
+ if(v=val('bodyStyle')){
+  const bf=val('bfont');
+  add(`[BODY TEXT LAYOUT]: ${dot(v)}${bf?` Font: ${dot(bf.replace('{S}',L[0]))}`:''}`);
+ }
+ if($('#onText').checked){
+  const lines=$('#body').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  $('#lc').textContent=lines.length+' lines';
+  add(`[THE TEXT TO RENDER]${LV>1?` (${lines.length} lines, in this exact order, each on its own row)`:''}:\n`+lines.map(s=>`"${s}"`).join('\n'));
+ }
+ if(v=val('border'))add(`[BORDER]: ${dot(v)}`);
+ if(LV>=2)add(`[COMPOSITION]: Strict top-to-bottom hierarchy. The deity illustration occupies roughly the top 35% of the canvas, the heading banner sits directly beneath it, and the text panel fills the lower area. Everything is centered with symmetrical balance and a safe margin of about 6% on all sides. No decoration may overlap or reduce the readability of any text.`,'c');
+ if($('#onGuard').checked)add(`[CRITICAL INSTRUCTIONS FOR TYPOGRAPHY & RENDERING]:
+- Render the ${L[1]} text exactly as provided, preserving every character, including ${L[2]}.
+- Do not translate, transliterate, paraphrase, add, or drop any word.
+- Every character must be sharp, high-resolution, perfectly legible, and free of typos, distortion, or blur.
+- Keep clean spacing between lines so the layout feels like a professionally designed poster.${LV>=2?'\n- The heading must be noticeably larger than the body text, and all body lines must share the same size and alignment.':''}`,'g');
+ if(LV>=2)add(`[QUALITY]: Ultra-sharp, 4K detail, print-ready, balanced contrast, polished professional poster design with the deity's face clear, serene and anatomically correct.`,'c');
+ if(LV>=3)add(`[NEGATIVE]: No extra or missing limbs or fingers, no duplicated faces, no cropped heads, no watermarks or logos, no random or gibberish text, no garbled ${L[0]} glyphs, no clutter behind the text, no text outside the specified lines.`,'n');
+ return P;
+}
+function render(){
+ const P=compose(),out=$('#out');out.innerHTML='';
+ P.forEach(p=>{const d=document.createElement('div');d.className='part '+(p.cls||'');d.textContent=p.text;out.appendChild(d);});
+ const t=plain();
+ $('#stats').textContent=`${t.length} characters · ${t.split(/\s+/).filter(Boolean).length} words`;
+}
+const plain=()=>compose().map(p=>p.text).join('\n\n');
 
-            promptParts.push(subjects);
-        }
+// ---------- events ----------
+groups.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;S[b.dataset.k]=+b.dataset.i;sync();});
+groups.addEventListener('change',e=>{const k=e.target.dataset.on;if(k){ON[k]=e.target.checked;sync();}});
+groups.addEventListener('input',e=>{if(e.target.classList.contains('cust')){CU[e.target.closest('.card').id.slice(5)]=e.target.value;render();}});
+['#lang','#title','#body','#onText'].forEach(s=>$(s).addEventListener('input',render));
+$('#lv').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;LV=+b.dataset.v;lv();render();});
+function lv(){document.querySelectorAll('#lv button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===LV));}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800);}
+function copy(){navigator.clipboard.writeText(plain()).then(()=>toast('Prompt copied'),()=>toast('Copy failed. Select the text manually.'));}
+$('#copy').onclick=$('#copy2').onclick=copy;
+$('#dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([plain()],{type:'text/plain;charset=utf-8'}));a.download='poster-prompt.txt';a.click();URL.revokeObjectURL(a.href);};
+$('#theme').onclick=()=>{const d=document.documentElement,dk=d.dataset.theme==='dark';dk?d.removeAttribute('data-theme'):d.dataset.theme='dark';$('#theme').textContent=dk?'Dark mode':'Light mode';};
+if(matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.dataset.theme='dark';$('#theme').textContent='Light mode';}
 
-        // 3. Background
-        if (document.getElementById('enableBackground').checked) {
-            const background = getValue('background', 'customBackground', 'Background Details');
-            promptParts.push(background);
-        }
-
-        // 4. Panel Style
-        if (document.getElementById('enablePanelStyle').checked) {
-            const panelStyle = getValue('panelStyle', 'customPanelStyle', 'Panel Style');
-            promptParts.push(panelStyle);
-        }
-
-        // 5. Heading Style & Text
-        if (document.getElementById('enableHeadingStyle').checked) {
-            const headingSelection = document.getElementById('headingStyle').value;
-            const titleText = document.getElementById('titleText').value.trim();
-            let headingPrompt = '';
-
-            if (headingSelection === 'green-stroke') {
-                headingPrompt = `[HEADING]: Green Paint stroke ( White Text) Include the title text clearly written out: "${titleText}".`;
-            } else if (headingSelection === 'blue-stroke') {
-                headingPrompt = `[HEADING]: Below the deity illustration, a prominent horizontal deep blue brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a stylized, white script: "${titleText}".`;
-            } else if (headingSelection === 'red-stroke') {
-                headingPrompt = `[HEADING]: Below the deity illustration, a prominent vibrant red brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a bold white script: "${titleText}".`;
-            } else if (headingSelection === 'saffron-stroke') {
-                headingPrompt = `[HEADING]: Below the deity illustration, a prominent horizontal orange/saffron brushstroke/paint stroke banner serves as a highlight background. Overlaid on this banner is the title text written cleanly in a stylized white script: "${titleText}".`;
-            } else if (headingSelection === 'gold-plate') {
-                headingPrompt = `[HEADING]: Below the illustration, a sleek metallic golden plate graphic serves as the title background. Overlaid on this is the title text in a bold, dark navy blue script: "${titleText}".`;
-            } else if (headingSelection === 'minimal-rect') {
-                headingPrompt = `[HEADING]: Below the illustration, a clean geometric rectangle frame outlines the header space. Inside it, the title is written in an elegant, bold red font: "${titleText}".`;
-            } else if (headingSelection === 'CUSTOM') {
-                const customHeadingText = document.getElementById('customHeadingStyle').querySelector('input').value.trim() || '[Custom Heading Layout Elements]';
-                headingPrompt = `[HEADING]: ${customHeadingText} Include the title text clearly written out: "${titleText}".`;
-            }
-            promptParts.push(headingPrompt);
-        }
-
-        // 6. Body Style
-        if (document.getElementById('enableBodyStyle').checked) {
-            const bodyStyle = getValue('bodyStyle', 'customBodyStyle', 'Typography Style Rules');
-            promptParts.push(`[BODY TEXT LAYOUT]: ${bodyStyle}`);
-        }
-
-        // 7. Body Text
-        if (document.getElementById('enableBodyText').checked) {
-            const bodyText = document.getElementById('bodyText').value;
-            const lines = bodyText.split('\n').filter(line => line.trim() !== '');
-            let formattedLines = '[THE TEXT TO RENDER]:\n';
-            lines.forEach(line => {
-                formattedLines += `"${line.trim()}"\n`;
-            });
-            promptParts.push(formattedLines.trim());
-        }
-
-        // 8. Border Style
-        if (document.getElementById('enableBorderStyle').checked) {
-            const borderStyle = getValue('borderStyle', 'customBorder', 'Border/Framing Style');
-            promptParts.push(borderStyle);
-        }
-
-        // 9. Guardrails
-        if (document.getElementById('enableGuardrails').checked) {
-            const guardrails = `[CRITICAL INSTRUCTIONS FOR TYPOGRAPHY & RENDERING]:
-- The text script must be rendered exactly as provided, preserving all precise character shapes, complex text conjuncts, and vowel signs (matras). 
-- Every character must be sharp, high-resolution, perfectly legible, and free of typos, digital distortion, or text blurring. 
-- Ensure absolutely clean spacing between lines so the layout feels like a professionally designed poster.`;
-            promptParts.push(guardrails);
-        }
-
-        document.getElementById('promptResult').innerText = promptParts.join('\n\n');
-    }
-
-    function copyToClipboard() {
-        const textToCopy = document.getElementById('promptResult').innerText;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            const msg = document.getElementById('copyMessage');
-            msg.style.display = 'block';
-            setTimeout(() => {
-                msg.style.display = 'none';
-            }, 2500);
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-        });
-    }
-
-    window.onload = updatePrompt;
+// guardrails toggle lives in the aside-free form: add as its own card
+const gc=document.createElement('div');gc.className='card';gc.innerHTML='<div class="ch"><label><input type="checkbox" id="onGuard" checked> Typography guardrails</label><small>Script-specific rules so text renders exactly</small></div>';
+groups.appendChild(gc);gc.querySelector('input').addEventListener('change',render);
+lv();sync();
 </script>
-
 </body>
 </html>
